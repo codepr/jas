@@ -30,9 +30,10 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import it.unipd.math.pcd.actors.AbsActorSystem;
 import it.unipd.math.pcd.actors.Actor;
 import it.unipd.math.pcd.actors.ActorRef;
@@ -40,17 +41,40 @@ import it.unipd.math.pcd.actors.ActorSystem;
 import it.unipd.math.pcd.actors.ActorSystem.ActorMode;
 import it.unipd.math.pcd.actors.impl.AbsActorRef;
 
+/**
+ * Basic cluster implementation, handle an {@code ActorSystem} for every
+ * instance and tracks every new member added, currently there's no leader
+ * election system nor failure detection across the cluster.
+ * Could be possibly interesting to implement a basic heartbeat system, maybe a
+ * gossip protocol like Akka's one.
+ *
+ * @author Andrea Giacomo Baldan
+ * @version 2.0
+ * @since 1.0
+ */
 public class ClusterImpl extends UnicastRemoteObject implements Cluster {
 
     // public static final long serialVersionUID = 227L;
+    /**
+     * A unique id inside the cluster, must be unique to be registered in the
+     * RMI registry
+     */
     private final String uuid;
+
+    /**
+     * Reference to the local {@code ActorSystem}
+     */
     private final ActorSystem system;
+
+    /**
+     * Members of the cluster, tracks all new joining members
+     */
     private Set<String> members;
 
     public ClusterImpl(ActorSystem system, String host, String seedHost) throws RemoteException {
         super();
         this.system = (AbsActorSystem) system;
-        this.members = new HashSet<String>();
+        this.members = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
         System.out.println("Host: " + host + " seed: " + seedHost);
         if (!host.equals(seedHost))
             this.uuid = host + "/" + UUID.randomUUID().toString().replaceAll("-", "");
@@ -90,6 +114,13 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         System.out.println(" *** New remote actor added to the cluster: rmi://" + name + " *** ");
     }
 
+    /**
+     * Update members {@code Set} of every member of the cluster
+     *
+     * @param seedHost The seed node used to start and join the cluster, can be
+     * seen as a sort of leader in the cluster.
+     * @param memberName The new joining member unique name inside the cluster
+     */
     private void updateMembers(String seedHost, String memberName) {
         try {
             final Cluster cluster = (Cluster) Naming.lookup("rmi://" + seedHost + "/master");
@@ -110,6 +141,15 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 });
     }
 
+    /**
+     * Update remote {@code ActorRef} tracker inside the {@code ActorSystem} of
+     * every member of the cluster
+     *
+     * @param name The unique name of the remote {@code ActorRef} created inside
+     * the cluster
+     * @param remoteRef The {@code ActorRef} remote reference to be tracked
+     * inside every instance of {@code ActorSystem} inside the cluster
+     */
     private void updateRemoteActors(String name, ActorRef<?> remoteRef) {
         members.stream()
             .filter(x -> !x.equals(uuid))

@@ -67,7 +67,7 @@ public class TestActorRef<T extends Message> implements ActorRef<T> {
     }
 
     @Override
-    public void send(T message, ActorRef<?> to) throws RemoteException {
+    public void send(T message, ActorRef<T> to) throws RemoteException {
         reference.send(message, to);
     }
 

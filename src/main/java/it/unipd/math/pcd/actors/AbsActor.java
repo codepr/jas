@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p/>
- * Copyright (c) 2015 Riccardo Cardin
+ * Copyright (c) 2016 Riccardo Cardin, Andrea Giacomo Baldan
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * <p/>
- * Please, insert description here.
- *
- * @author Riccardo Cardin
- * @author Andrea Giacomo Baldan
- * @version 1.0
- * @since 1.0
- */
-
-/**
- * Please, insert description here.
- *
- * @author Riccardo Cardin
- * @author Andrea Giacomo Baldan
- * @version 1.0
- * @since 1.0
  */
 package it.unipd.math.pcd.actors;
 
@@ -51,8 +36,10 @@ import it.unipd.math.pcd.actors.impl.AbsActorRef;
  * Defines common properties of all actors.
  *
  * @author Riccardo Cardin
- * @author Andrea Giacomo Baldan
  * @version 1.0
+ * @since 1.0
+ * @author Andrea Giacomo Baldan
+ * @version 2.0
  * @since 1.0
  */
 public abstract class AbsActor<T extends Message> implements Actor<T> {
@@ -148,6 +135,7 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
      * @return True if the actor is looping, otherwise false
      */
     private boolean isLooping() { return this.looping; }
+
     /**
      * Remove the head message from the mailbox, ready to be processed
      * @throws NoSuchActorException if the actor is not alive (stopped)

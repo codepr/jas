@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p/>
- * Copyright (c) 2015 Andrea Giacomo Baldan
+ * Copyright (c) 2016 Andrea Giacomo Baldan
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * <p/>
- * Please, insert description here.
- *
- * @author Andrea Giacomo Baldan
- * @version 1.0
- * @since 1.0
  */
 package it.unipd.math.pcd.actors.impl;
 
@@ -35,6 +30,14 @@ import java.util.concurrent.ExecutorService;
 import it.unipd.math.pcd.actors.AbsActorSystem;
 import it.unipd.math.pcd.actors.ActorRef;
 
+/**
+ * A map-based implementation of the actor system, can handle local actors and
+ * remotes as well.
+ *
+ * @author Andrea Giacomo Baldan
+ * @version 2.0
+ * @since 1.0
+ */
 public class ActorSystemImpl extends AbsActorSystem {
 
     /**
@@ -51,6 +54,7 @@ public class ActorSystemImpl extends AbsActorSystem {
 
     /**
      * Create an instance of {@link ActorRef}
+     *
      * @param mode Possible mode to create an actor. Could be{@code LOCAL} or
      * {@code REMOTE}.
      * @return An instance to {@link ActorRef}
@@ -78,6 +82,7 @@ public class ActorSystemImpl extends AbsActorSystem {
 
     /**
      * Execute a runnable with {@code eService} instance of Executor
+     *
      * @param receivingLoop Runnable type to be executed
      */
     @Override

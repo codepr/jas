@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p/>
- * Copyright (c) 2015 Riccardo Cardin
+ * Copyright (c) 2016 Riccardo Cardin, Andrea Giacomo Baldan
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -126,6 +126,7 @@ public abstract class AbsActorSystem implements ActorSystem {
 
     /**
      * Return the actor associated to a given ActorRef inside the HashMap
+     *
      * @param ref reference to ActorRef
      * @return The actor associated to ref
      * @throws NoSuchActorException if no actor was found
@@ -137,13 +138,16 @@ public abstract class AbsActorSystem implements ActorSystem {
     }
 
     /**
-     * Execute a runnable with {@code eService} instance of Executor
+     * Execute a runnable with {@code eService} instance of Executor, used to
+     * start the consuming loop of every actor's mailbox.
+     *
      * @param receivingLoop Runnable type to be executed
      */
     public abstract void startActorReceiveLoop(Runnable receivingLoop);
 
     /**
      * Create an instance of {@link ActorRef}
+     *
      * @param mode Possible mode to create an actor. Could be{@code LOCAL} or
      * {@code REMOTE}.
      * @param name A String representing the name of the Actor inside the Cluster

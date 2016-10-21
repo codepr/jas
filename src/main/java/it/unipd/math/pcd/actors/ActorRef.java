@@ -50,5 +50,5 @@ public interface ActorRef<T extends Message> extends Remote {
      * @param message The message to send
      * @param to The actor to which sending the message
      */
-    void send(T message, ActorRef<?> to) throws RemoteException;
+    void send(T message, ActorRef<T> to) throws RemoteException;
 }

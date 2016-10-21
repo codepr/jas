@@ -9,3 +9,7 @@
 .classpath
 .settings
 
+# testing purpose
+Main.java
+TrivialActor.java
+TrivialMessage.java

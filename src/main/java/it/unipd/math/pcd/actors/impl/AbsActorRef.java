@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p/>
- * Copyright (c) 2015 Andrea Giacomo Baldan
+ * Copyright (c) 2016 Andrea Giacomo Baldan
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
  * Using this reference it is possible to send a message among actors.
  *
  * @author Andrea Giacomo Baldan
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject implements ActorRef<T> {
@@ -86,13 +86,13 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
      * @param to The actor to which sending the message
      */
     @Override
-    public void send(T message, ActorRef<?> to) throws RemoteException {
+    public void send(T message, ActorRef<T> to) throws RemoteException {
         if (!system.contains(to)) {
             String name = to.getName();
             if (system.containsRemote(name)) {
                 try {
                     System.out.println(" *** Sending message to remote actor: " + name);
-                    ActorRef<T> remoteRef = (ActorRef) Naming.lookup("rmi://" + name);
+                    ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + name);
                     remoteRef.send(message, to);
                 } catch (NotBoundException | MalformedURLException e) {
                     e.printStackTrace();

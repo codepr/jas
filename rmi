@@ -1,0 +1,6 @@
+#!/bin/sh
+
+killall rmiregistry
+cd target/classes/
+rmiregistry &
+cd ../..

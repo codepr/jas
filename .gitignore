@@ -1,0 +1,11 @@
+/bin/
+/target/
+/out/
+.idea
+*.iml
+*.class
+*.xmi
+.project
+.classpath
+.settings
+

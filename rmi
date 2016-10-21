@@ -2,5 +2,6 @@
 
 killall rmiregistry
 cd target/classes/
+sleep 1
 rmiregistry &
 cd ../..

@@ -62,13 +62,13 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         super();
         this.system = (AbsActorSystem) system;
         this.name = name;
-        if (mode == ActorMode.REMOTE) {
+        // if (mode == ActorMode.REMOTE) {
             try {
                 Naming.bind("rmi://" + name, this);
             } catch (AlreadyBoundException | MalformedURLException e) {
                 e.printStackTrace();
             }
-        }
+        // }
     }
 
     /**

@@ -75,11 +75,13 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         super();
         this.system = (AbsActorSystem) system;
         this.members = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-        System.out.println("Host: " + host + " seed: " + seedHost);
         if (!host.equals(seedHost))
             this.uuid = host + "/" + UUID.randomUUID().toString().replaceAll("-", "");
         else this.uuid = host + "/master";
         try {
+            // if (System.getSecurityManager() == null) {
+            //     System.setSecurityManager(new SecurityManager());
+            // }
             Naming.bind("rmi://" + this.uuid, this);
             join(this.uuid);
             if (!host.equals(seedHost))
@@ -92,7 +94,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
     @Override
     public void join(String name) throws RemoteException {
         members.add(name);
-        System.out.println(" *** New member added to the cluster: rmi://" + name + " *** ");
+        System.out.println(" [*] New member added to the cluster: rmi://" + name);
     }
 
     @Override
@@ -100,18 +102,43 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         if (mode == ActorMode.LOCAL)
             return system.actorOf(actor, mode, name);
         else {
-            ActorRef remoteRef = system.actorOf(actor, ActorMode.LOCAL, name);
-            String id = ((AbsActorRef<?>) remoteRef).getName();
-            addRemoteRef(id, remoteRef);
-            updateRemoteActors(this.uuid + id, remoteRef);
+            ActorRef remoteRef = null;
+            String addr = name.split("/")[0];
+            String memberName = (String)
+                members.stream().filter(x -> x.startsWith(addr)).toArray()[0];
+            try {
+                Cluster remoteMember = (Cluster) Naming.lookup("rmi://" + memberName);
+                remoteRef = remoteMember.actorOf(actor, ActorMode.LOCAL, name);
+                String id = remoteRef.getName();
+                addRemoteRef(id, remoteRef);
+                updateRemoteActors(this.uuid + id, remoteRef);
+            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                e.printStackTrace();
+            }
+            // ActorRef remoteRef = system.actorOf(actor, ActorMode.LOCAL, name);
+            // String id = ((AbsActorRef<?>) remoteRef).getName();
+            // addRemoteRef(id, remoteRef);
+            // updateRemoteActors(this.uuid + id, remoteRef);
             return remoteRef;
         }
     }
 
     @Override
+    public ActorRef actorSelection(String address) throws RemoteException {
+        ActorRef remoteRef = null;
+        try {
+            remoteRef = (ActorRef<?>) Naming.lookup("rmi://" + address);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.out.println("[!] No remote actor found " + e.getMessage());
+            e.printStackTrace();
+        }
+        return remoteRef;
+    }
+
+    @Override
     public void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException {
         ((AbsActorSystem) system).addRemoteRef(name, remoteRef);
-        System.out.println(" *** New remote actor added to the cluster: rmi://" + name + " *** ");
+        System.out.println(" [*] New remote actor added to the cluster: rmi://" + name);
     }
 
     /**

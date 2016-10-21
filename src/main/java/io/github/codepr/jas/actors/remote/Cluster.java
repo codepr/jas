@@ -71,4 +71,7 @@ public interface Cluster extends Remote {
      * @return A reference to the actor
      */
     ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException;
+
+    ActorRef actorSelection(String address) throws RemoteException;
+
 }

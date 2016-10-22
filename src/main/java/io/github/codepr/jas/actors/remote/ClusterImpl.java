@@ -150,7 +150,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
             final Cluster cluster = (Cluster) Naming.lookup("rmi://" + seedHost + "/master");
             cluster.join(memberName);
             // update remote actors to the newest joined node
-            cluster.updateRemoteActors();
+            cluster.updateRemoteActors(memberName);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
@@ -168,21 +168,18 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
     }
 
     @Override
-    public void updateRemoteActors() throws RemoteException {
-        members.stream()
-            .forEach(m -> {
-                    system.getRemoteActors()
-                        .entrySet()
-                        .stream()
-                        .forEach(x -> {
-                                try {
-                                    final Cluster clusterMember =
-                                        (Cluster) Naming.lookup("rmi://" + m);
-                                    clusterMember.addRemoteRef(x.getKey(), x.getValue());
-                                } catch (RemoteException | MalformedURLException | NotBoundException e) {
-                                    e. printStackTrace();
-                                }
-                            });
+    public void updateRemoteActors(String newMember) throws RemoteException {
+        system.getRemoteActors()
+            .entrySet()
+            .stream()
+            .forEach(x -> {
+                    try {
+                        final Cluster cluster =
+                            (Cluster) Naming.lookup("rmi://" + newMember);
+                        cluster.addRemoteRef(x.getKey(), x.getValue());
+                    } catch (RemoteException | MalformedURLException | NotBoundException e) {
+                        e. printStackTrace();
+                    }
                 });
     }
 

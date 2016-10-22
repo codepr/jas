@@ -60,7 +60,14 @@ public interface Cluster extends Remote {
      */
     void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException;
 
-    void updateRemoteActors() throws RemoteException;
+    /**
+     * Update new members' remote actors map so they can access to the actors
+     * located on other {@code ActorSystem}.
+     *
+     * @param newMember The identifier name of the new member, in order to be
+     * located across the cluster and be updated with remote actors table.
+     */
+    void updateRemoteActors(String newMember) throws RemoteException;
 
     /**
      * Create an instance of {@code actor} returning a {@link ActorRef reference}
@@ -74,6 +81,11 @@ public interface Cluster extends Remote {
      */
     ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException;
 
+    /**
+     * Select a remote actor located on another {@code ActorSystem}.
+     *
+     * @param address The address of the remote actors to be retrieved
+     */
     ActorRef actorSelection(String address) throws RemoteException;
 
 }

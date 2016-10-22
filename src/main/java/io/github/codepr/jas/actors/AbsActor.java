@@ -24,11 +24,7 @@
  */
 package io.github.codepr.jas.actors;
 
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 import io.github.codepr.jas.actors.exceptions.UnsupportedMessageException;
 import io.github.codepr.jas.actors.mailbox.MailBox;

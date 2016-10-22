@@ -112,10 +112,6 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
-            // ActorRef remoteRef = system.actorOf(actor, ActorMode.LOCAL, name);
-            // String id = ((AbsActorRef<?>) remoteRef).getName();
-            // addRemoteRef(id, remoteRef);
-            // updateRemoteActors(this.uuid + id, remoteRef);
             return remoteRef;
         }
     }

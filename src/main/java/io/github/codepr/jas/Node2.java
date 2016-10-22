@@ -13,7 +13,9 @@ public class Node2 {
         try {
             ActorRef ref3 = cluster.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref3");
             ActorRef ref2 = cluster.actorSelection("127.0.0.1/ref2");
+            ActorRef ref5 = cluster.actorSelection("127.0.0.1/ref5");
             ref3.send(new TrivialMessage(), ref2);
+            // ref2.send(new TrivialMessage(), ref5);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

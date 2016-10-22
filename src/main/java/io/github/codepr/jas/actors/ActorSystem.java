@@ -42,7 +42,12 @@ import java.util.Map;
  */
 public interface ActorSystem {
 
+    /**
+     * Return the remote actors {@code Map} tracking all remote reference of
+     * {@code ActorRef}.
+     */
     Map<String, ActorRef<?>> getRemoteActors();
+
     /**
      * Create an instance of {@code actor} returning a {@link ActorRef reference}
      * to it using the given {@code mode} and a name.

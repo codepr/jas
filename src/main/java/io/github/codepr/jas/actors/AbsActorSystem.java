@@ -48,7 +48,6 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    // private Map<ActorRef<?>, Actor<?>> actors;
     private Map<String, Actor<?>> actors;
     /**
      * Associates every remote name to the remote Actor identified by
@@ -103,11 +102,15 @@ public abstract class AbsActorSystem implements ActorSystem {
 
     @Override
     public void stop(ActorRef<?> actor) {
-        if (!actors.containsKey(actor)) {
+        String name = "";
+        try {
+            name = actor.getName();
+        } catch (RemoteException e) {}
+        if (!actors.containsKey(name)) {
             throw new NoSuchActorException();
         }
-        ((AbsActor) actors.get(actor)).stop();
-        actors.remove(actor);
+        ((AbsActor) actors.get(name)).stop();
+        actors.remove(name);
     }
 
     @Override

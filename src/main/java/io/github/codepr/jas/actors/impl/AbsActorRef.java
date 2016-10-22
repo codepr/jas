@@ -30,8 +30,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Objects;
-
 import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.AbsActorSystem;
@@ -109,26 +107,6 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
             }
         }
     }
-
-    // @Override
-    // public int hashCode() {
-    //     return Objects.hash(name);
-    // }
-
-    // @Override
-    // public boolean equals(Object o) {
-    //     if (o == this) return true;
-    //     if (!(o instanceof ActorRef)) {
-    //         return false;
-    //     }
-
-    //     ActorRef ref = (ActorRef) o;
-    //     String name = "";
-    //     try {
-    //         name = ref.getName();
-    //     } catch (RemoteException e) {}
-    //     return (this.name == name);
-    // }
 
     /**
      * Execute a runnable using {@code system}

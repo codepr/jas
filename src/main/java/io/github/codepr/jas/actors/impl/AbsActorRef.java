@@ -30,6 +30,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Objects;
+
 import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.AbsActorSystem;
@@ -63,11 +65,11 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         this.system = (AbsActorSystem) system;
         this.name = name;
         // if (mode == ActorMode.REMOTE) {
-            try {
-                Naming.bind("rmi://" + name, this);
-            } catch (AlreadyBoundException | MalformedURLException e) {
-                e.printStackTrace();
-            }
+        try {
+            Naming.bind("rmi://" + name, this);
+        } catch (AlreadyBoundException | MalformedURLException e) {
+            e.printStackTrace();
+        }
         // }
     }
 
@@ -91,7 +93,7 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
             String name = to.getName();
             if (system.containsRemote(name)) {
                 try {
-                    System.out.println(" *** Sending message to remote actor: " + name);
+                    System.out.println(" [->] Sending message to remote actor: " + name);
                     ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + name);
                     remoteRef.send(message, to);
                 } catch (NotBoundException | MalformedURLException e) {
@@ -100,13 +102,33 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
             } else throw new NoSuchActorException();
         } else {
             try {
-                ((AbsActor<T>) system.getActor(to)).enqueue(message);
                 ((AbsActor<T>) system.getActor(to)).setSender(this);
+                ((AbsActor<T>) system.getActor(to)).enqueue(message);
             } catch (NoSuchActorException e) {
                 throw e;
             }
         }
     }
+
+    // @Override
+    // public int hashCode() {
+    //     return Objects.hash(name);
+    // }
+
+    // @Override
+    // public boolean equals(Object o) {
+    //     if (o == this) return true;
+    //     if (!(o instanceof ActorRef)) {
+    //         return false;
+    //     }
+
+    //     ActorRef ref = (ActorRef) o;
+    //     String name = "";
+    //     try {
+    //         name = ref.getName();
+    //     } catch (RemoteException e) {}
+    //     return (this.name == name);
+    // }
 
     /**
      * Execute a runnable using {@code system}

@@ -79,9 +79,6 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
             this.uuid = host + "/" + UUID.randomUUID().toString().replaceAll("-", "");
         else this.uuid = host + "/master";
         try {
-            // if (System.getSecurityManager() == null) {
-            //     System.setSecurityManager(new SecurityManager());
-            // }
             Naming.bind("rmi://" + this.uuid, this);
             join(this.uuid);
             if (!host.equals(seedHost))
@@ -102,7 +99,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         if (mode == ActorMode.LOCAL)
             return system.actorOf(actor, mode, name);
         else {
-            ActorRef remoteRef = null;
+            ActorRef<?> remoteRef = null;
             String addr = name.split("/")[0];
             String memberName = (String)
                 members.stream().filter(x -> x.startsWith(addr)).toArray()[0];
@@ -129,7 +126,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         try {
             remoteRef = (ActorRef<?>) Naming.lookup("rmi://" + address);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            System.out.println("[!] No remote actor found " + e.getMessage());
+            System.out.println(" [!] No remote actor found " + e.getMessage());
             e.printStackTrace();
         }
         return remoteRef;
@@ -152,6 +149,8 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         try {
             final Cluster cluster = (Cluster) Naming.lookup("rmi://" + seedHost + "/master");
             cluster.join(memberName);
+            // update remote actors to the newest joined node
+            cluster.updateRemoteActors();
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         }
@@ -165,6 +164,25 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                     } catch (NotBoundException | MalformedURLException | RemoteException e) {
                         e.printStackTrace();
                     }
+                });
+    }
+
+    @Override
+    public void updateRemoteActors() throws RemoteException {
+        members.stream()
+            .forEach(m -> {
+                    system.getRemoteActors()
+                        .entrySet()
+                        .stream()
+                        .forEach(x -> {
+                                try {
+                                    final Cluster clusterMember =
+                                        (Cluster) Naming.lookup("rmi://" + m);
+                                    clusterMember.addRemoteRef(x.getKey(), x.getValue());
+                                } catch (RemoteException | MalformedURLException | NotBoundException e) {
+                                    e. printStackTrace();
+                                }
+                            });
                 });
     }
 

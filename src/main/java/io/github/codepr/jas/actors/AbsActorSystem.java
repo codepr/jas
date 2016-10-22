@@ -26,9 +26,11 @@ package io.github.codepr.jas.actors;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 
 /**
@@ -46,7 +48,8 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    private Map<ActorRef<?>, Actor<?>> actors;
+    // private Map<ActorRef<?>, Actor<?>> actors;
+    private Map<String, Actor<?>> actors;
     /**
      * Associates every remote name to the remote Actor identified by
      */
@@ -56,6 +59,9 @@ public abstract class AbsActorSystem implements ActorSystem {
         actors = new ConcurrentHashMap<>();
         remoteActors = new ConcurrentHashMap<>();
     }
+
+    @Override
+    public Map<String, ActorRef<?>> getRemoteActors() { return this.remoteActors; }
 
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) {
@@ -69,7 +75,7 @@ public abstract class AbsActorSystem implements ActorSystem {
             Actor actorInstance = ((AbsActor) actor.newInstance()).setSelf(reference);
             // Associate the reference to the actor
             if (mode == ActorMode.LOCAL)
-                actors.put(reference, actorInstance);
+                actors.put(name, actorInstance);
             else remoteActors.put(name, reference);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new NoSuchActorException(e);
@@ -113,7 +119,11 @@ public abstract class AbsActorSystem implements ActorSystem {
     }
 
     public boolean contains(ActorRef<?> actorRef) {
-        return (actors.containsKey(actorRef)) ? true : false;
+        String name = "";
+        try {
+            name = actorRef.getName();
+        } catch (RemoteException e) {}
+        return (actors.containsKey(name)) ? true : false;
     }
 
     public boolean containsRemote(String name) {
@@ -132,7 +142,10 @@ public abstract class AbsActorSystem implements ActorSystem {
      * @throws NoSuchActorException if no actor was found
      */
     public Actor<?> getActor(ActorRef<?> ref) {
-        Actor ret = actors.get(ref);
+        Actor ret = null;
+        try {
+            ret = actors.get(ref.getName());
+        } catch (RemoteException e) {}
         if (ret == null) throw new NoSuchActorException();
         return ret;
     }
@@ -156,4 +169,5 @@ public abstract class AbsActorSystem implements ActorSystem {
      * @return An instance to {@link ActorRef}
      */
     protected abstract ActorRef createActorReference(ActorMode mode, String name);
+
 }

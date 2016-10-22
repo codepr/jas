@@ -60,6 +60,8 @@ public interface Cluster extends Remote {
      */
     void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException;
 
+    void updateRemoteActors() throws RemoteException;
+
     /**
      * Create an instance of {@code actor} returning a {@link ActorRef reference}
      * to it using the given {@code mode} and a unique name inside the cluster.

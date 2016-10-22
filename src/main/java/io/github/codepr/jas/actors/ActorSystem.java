@@ -24,6 +24,8 @@
  */
 package io.github.codepr.jas.actors;
 
+import java.util.Map;
+
 /**
  * The system of actors. Using the system it is possible to:
  * <ul>
@@ -40,6 +42,7 @@ package io.github.codepr.jas.actors;
  */
 public interface ActorSystem {
 
+    Map<String, ActorRef<?>> getRemoteActors();
     /**
      * Create an instance of {@code actor} returning a {@link ActorRef reference}
      * to it using the given {@code mode} and a name.

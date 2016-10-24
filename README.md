@@ -18,14 +18,18 @@ the structure remained more or less the same, except for some additions aimed to
 handle the distributed part of the Actor System.
 
 The overall structure has been enveloped on a fairly basic and still without
-failure-detection cluster system featuring legacy java RMI, therefore it needs
-a *rmi registry* running.
+failure-detection cluster system featuring legacy java RMI, therefore it needs a
+*rmi registry* running. One of the many difference between the previous local
+implementation is represented by the mandatory naming of the actors, this allow
+the `ActorSystem` to track every actor inside the cluster in case of distributed
+computing.
 
-Basically, starting the cluster as a seed (can be seen as leader node) all other
-nodes can subsequently join by specifying the seed address; every time a new member
-joins the cluster, all other nodes will be update their members list and everytime
-an `ActorSystem` create an actor, either `LOCAL` or `REMOTE` all members of the
-cluster update their systems in order to track all actors on the cluster.
+Basically, after starting the cluster as a seed (can be seen as leader node) all
+other nodes can subsequently join by specifying the seed address; every time a
+new member joins the cluster, all other nodes will be update their members list
+and everytime an `ActorSystem` create an actor, either `LOCAL` or `REMOTE` all
+members of the cluster update their systems in order to track all actors on the
+cluster.
 
 ### General operations
 

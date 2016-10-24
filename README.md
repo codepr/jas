@@ -17,7 +17,7 @@ to [pcd-actors](https://github.com/codepr/pcd-actors)' README, at a local level
 the structure remained more or less the same, except for some additions aimed to
 handle the distributed part of the Actor System.
 
-The basic structure has been enveloped on a fairly basic and still without
+The overall structure has been enveloped on a fairly basic and still without
 failure-detection cluster system featuring legacy java RMI, therefore it needs
 a *rmi registry* running.
 

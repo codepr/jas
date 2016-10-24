@@ -144,17 +144,23 @@ public class Node2 {
 
 The `jas` project is configured as a [Maven](https://maven.apache.org/) project. In detail, it was generated using the following command line:
 
-mvn archetype:generate -DarchetypeGroupId=io.github.codepr.jas.actors -DarchetypeArtifactId=pcd-actors -DarchetypeVersion=1.0-SNAPSHOT.
+```sh
+$ mvn archetype:generate -DarchetypeGroupId=io.github.codepr.jas.actors -DarchetypeArtifactId=pcd-actors -DarchetypeVersion=1.0-SNAPSHOT.
+```
 
 To build the actor system library use the following command
 
+```sh
 $ mvn package
+```
 
 The output library will be created by Maven inside the folder `target`, with name `pcd-actors.jar`.
 
 To run the tests use the command
 
+```sh
 $ mvn test
+```
 
 ## TODO
 

@@ -13,7 +13,7 @@ in a real case of use.
 ## Logical architecture
 
 For an exhaustive explanation of the system's logical architecture please refer
-to [pcd-actors](https://github.com/codepr/pcd-actors)'s README, at a local level
+to [pcd-actors](https://github.com/codepr/pcd-actors)' README, at a local level
 the structure remained more or less the same, except for some additions aimed to
 handle the distributed part of the Actor System.
 

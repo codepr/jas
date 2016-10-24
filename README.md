@@ -7,6 +7,9 @@ and distributed programming course, I proceeded to add some features like
 support for remote actors and a basic cluster system based on legacy RMI
 technology.
 
+Still under development, and likely bugged, it's not recommended to try it
+in a real case of use.
+
 ## Logical architecture
 
 For an exhaustive explanation of the system's logical architecture please refer

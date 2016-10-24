@@ -62,6 +62,11 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
     private final String uuid;
 
     /**
+     * Seed host, can be seen as a sorta of leader
+     */
+    private final String seed;
+
+    /**
      * Reference to the local {@code ActorSystem}
      */
     private final ActorSystem system;
@@ -75,6 +80,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         super();
         this.system = (AbsActorSystem) system;
         this.members = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+        this.seed = seedHost;
         if (!host.equals(seedHost))
             this.uuid = host + "/" + UUID.randomUUID().toString().replaceAll("-", "");
         else this.uuid = host + "/master";
@@ -96,9 +102,11 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
 
     @Override
     public ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
-        if (mode == ActorMode.LOCAL)
-            return system.actorOf(actor, mode, name);
-        else {
+        if (mode == ActorMode.LOCAL) {
+            ActorRef<?> localRef = system.actorOf(actor, mode, name);
+            updateRemoteActors(name, localRef);
+            return localRef;
+        } else {
             ActorRef<?> remoteRef = null;
             String addr = name.split("/")[0];
             String memberName = (String)
@@ -107,8 +115,6 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 Cluster remoteMember = (Cluster) Naming.lookup("rmi://" + memberName);
                 remoteRef = remoteMember.actorOf(actor, ActorMode.LOCAL, name);
                 String id = remoteRef.getName();
-                addRemoteRef(id, remoteRef);
-                updateRemoteActors(this.uuid + id, remoteRef);
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
@@ -199,5 +205,11 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                         e.printStackTrace();
                     }
                 });
+        try {
+            final Cluster master = (Cluster) Naming.lookup("rmi://" + this.seed + "/master");
+            master.addRemoteRef(name, remoteRef);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }

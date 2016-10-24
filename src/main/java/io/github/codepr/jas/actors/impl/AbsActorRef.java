@@ -53,6 +53,7 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
      */
     protected final AbsActorSystem system;
     protected final String name;
+    protected ActorRef<T> originalSender;
 
     /**
      * Public constructor, in case of an {@code ActorRef} of type
@@ -62,6 +63,7 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         super();
         this.system = (AbsActorSystem) system;
         this.name = name;
+        this.originalSender = this;
         // if (mode == ActorMode.REMOTE) {
         try {
             Naming.bind("rmi://" + name, this);
@@ -70,6 +72,11 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         }
         // }
     }
+
+    @Override
+    public void setOriginalSender(ActorRef<T> originalSender) throws RemoteException { this.originalSender = originalSender; }
+
+    public ActorRef<T> getOriginalSender() throws RemoteException { return this.originalSender; }
 
     /**
      * Return the name of the actor
@@ -88,11 +95,13 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
     @Override
     public void send(T message, ActorRef<T> to) throws RemoteException {
         if (!system.contains(to)) {
-            String name = to.getName();
-            if (system.containsRemote(name)) {
+            String destName = to.getName();
+            if (system.containsRemote(destName)) {
                 try {
-                    System.out.println(" [->] Sending message to remote actor: " + name);
-                    ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + name);
+                    String realDest = to.getOriginalSender().getName();
+                    System.out.println(" [" + originalSender.getName() + "] sending message to remote actor: " + realDest);
+                    ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + destName);
+                    remoteRef.setOriginalSender(this);
                     remoteRef.send(message, to);
                 } catch (NotBoundException | MalformedURLException e) {
                     e.printStackTrace();
@@ -100,7 +109,10 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
             } else throw new NoSuchActorException();
         } else {
             try {
-                ((AbsActor<T>) system.getActor(to)).setSender(this);
+                if (originalSender == this)
+                    ((AbsActor<T>) system.getActor(to)).setSender(this);
+                else
+                    ((AbsActor<T>) system.getActor(to)).setSender(this.originalSender);
                 ((AbsActor<T>) system.getActor(to)).enqueue(message);
             } catch (NoSuchActorException e) {
                 throw e;

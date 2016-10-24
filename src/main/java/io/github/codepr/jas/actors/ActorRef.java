@@ -45,6 +45,18 @@ public interface ActorRef<T extends Message> extends Remote {
     String getName() throws RemoteException;
 
     /**
+     * Set the {@code ActorRef} reference representing the original sender of
+     * the {@code Message} in case of remote {@code ActorRef}.
+     */
+    void setOriginalSender(ActorRef<T> originalSender) throws RemoteException;
+
+    /**
+     * Return the {@code ActorRef} reference of the original sender of the
+     * {@code Message} in case of remote {@code ActorRef}.
+     */
+    ActorRef<T> getOriginalSender() throws RemoteException;
+
+    /**
      * Sends a {@code message} to another actor
      *
      * @param message The message to send

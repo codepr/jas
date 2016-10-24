@@ -10,6 +10,7 @@
 .settings
 
 # testing purpose
-src/main/java/io/github/codepr/jas/Main.java
+src/main/java/io/github/codepr/jas/Node1.java
+src/main/java/io/github/codepr/jas/Node2.java
 src/main/java/io/github/codepr/jas/TrivialActor.java
 src/main/java/io/github/codepr/jas/TrivialMessage.java

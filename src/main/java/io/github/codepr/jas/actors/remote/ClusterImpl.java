@@ -39,6 +39,7 @@ import io.github.codepr.jas.actors.Actor;
 import io.github.codepr.jas.actors.ActorRef;
 import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
+import io.github.codepr.jas.actors.Message;
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 import io.github.codepr.jas.actors.AbsActorRef;
 
@@ -117,7 +118,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @return A reference to the actor
      */
     @Override
-    public ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
+    public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
         if (mode == ActorMode.LOCAL) {
             ActorRef<?> localRef = system.actorOf(actor, mode, name);
             updateRemoteActors(name, localRef);
@@ -144,8 +145,8 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param address The address of the remote actors to be retrieved
      */
     @Override
-    public ActorRef actorSelection(String address) throws RemoteException {
-        ActorRef remoteRef = null;
+    public ActorRef<? extends Message> actorSelection(String address) throws RemoteException {
+        ActorRef<?> remoteRef = null;
         try {
             remoteRef = (ActorRef<?>) Naming.lookup("rmi://" + address);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
@@ -166,7 +167,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * actor
      */
     @Override
-    public void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException {
+    public void addRemoteRef(String name, ActorRef<? extends Message> remoteRef) throws RemoteException {
         ((AbsActorSystem) system).addRemoteRef(name, remoteRef);
         System.out.println(" [*] New remote actor added to the cluster: rmi://" + name);
     }
@@ -229,7 +230,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param actor The actor to be stopped
      */
     @Override
-    public void stop(ActorRef<?> actorRef) throws RemoteException {
+    public void stop(ActorRef<? extends Message> actorRef) throws RemoteException {
         AbsActorSystem abSystem = (AbsActorSystem) system;
         if (!abSystem.contains(actorRef)) {
             String destName = actorRef.getName();
@@ -283,7 +284,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param remoteRef The {@code ActorRef} remote reference to be tracked
      * inside every instance of {@code ActorSystem} inside the cluster
      */
-    private void updateRemoteActors(String name, ActorRef<?> remoteRef) {
+    private void updateRemoteActors(String name, ActorRef<? extends Message> remoteRef) {
         members.stream()
             .filter(x -> !x.equals(uuid))
             .forEach(x -> {

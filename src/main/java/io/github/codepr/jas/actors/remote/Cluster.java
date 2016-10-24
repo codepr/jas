@@ -29,6 +29,7 @@ import java.rmi.RemoteException;
 import io.github.codepr.jas.actors.Actor;
 import io.github.codepr.jas.actors.ActorRef;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
+import io.github.codepr.jas.actors.Message;
 
 /**
  * Basic cluster, it makes possible to run multiple {@code ActorSystem} across a
@@ -58,7 +59,7 @@ public interface Cluster extends Remote {
      * @param remoteRef a {@code ActorRef} reference representing the remote
      * actor
      */
-    void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException;
+    void addRemoteRef(String name, ActorRef<? extends Message> remoteRef) throws RemoteException;
 
     /**
      * Update new members' remote actors map so they can access to the actors
@@ -79,7 +80,7 @@ public interface Cluster extends Remote {
      *
      * @return A reference to the actor
      */
-    ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException;
+    ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException;
 
     /**
      * Select a remote actor located on another {@code ActorSystem}.

@@ -49,7 +49,7 @@ public interface ActorSystem {
      * @return A {@code Map<String, ActorRef<?>>} containing all remote
      * reference of the cluster.
      */
-    Map<String, ActorRef<?>> getRemoteActors();
+    Map<String, ActorRef<? extends Message>> getRemoteActors();
 
     /**
      * Create an instance of {@code actor} returning a {@link ActorRef reference}
@@ -87,7 +87,7 @@ public interface ActorSystem {
      *
      * @param actor The actor to be stopped
      */
-    void stop(ActorRef<?> actor);
+    void stop(ActorRef<? extends Message> actor);
 
     /**
      * Stops all actors of the system.

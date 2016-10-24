@@ -48,11 +48,11 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    private Map<String, Actor<?>> actors;
+    private Map<String, Actor<? extends Message>> actors;
     /**
      * Associates every remote name to the remote Actor identified by
      */
-    private Map<String, ActorRef<?>> remoteActors;
+    private Map<String, ActorRef<? extends Message>> remoteActors;
     /**
      * {@code ActorSystem} mode, can be either {@code DEFAULT} to run on a
      * single machine, or {@code CLUSTER} to run on a cluster of multiple nodes.
@@ -86,7 +86,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      * reference of the cluster.
      */
     @Override
-    public Map<String, ActorRef<?>> getRemoteActors() {
+    public Map<String, ActorRef<? extends Message>> getRemoteActors() {
         return this.remoteActors;
     }
 
@@ -160,7 +160,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      * @param actor The actor to be stopped
      */
     @Override
-    public void stop(ActorRef<?> actor) {
+    public void stop(ActorRef<? extends Message> actor) {
         String name = "";
         try {
             name = actor.getName();
@@ -179,14 +179,14 @@ public abstract class AbsActorSystem implements ActorSystem {
     public void stop() {
         actors.entrySet()
             .stream()
-            .forEach(x -> ((AbsActor<?>) x.getValue()).stop());
+            .forEach(x -> ((AbsActor<? extends Message>) x.getValue()).stop());
         actors.clear();
     }
 
     /**
      * Check if the current {@code ActorSystem} contains a given {@code ActorRef}
      */
-    public boolean contains(ActorRef<?> actorRef) {
+    public boolean contains(ActorRef<? extends Message> actorRef) {
         String name = "";
         try {
             name = actorRef.getName();
@@ -205,7 +205,7 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Add a remote {@code ActorRef} to the current {@code ActorSystem}
      */
-    public void addRemoteRef(String name, ActorRef<?> remoteRef) {
+    public void addRemoteRef(String name, ActorRef<? extends Message> remoteRef) {
         remoteActors.put(name, remoteRef);
     }
 
@@ -216,7 +216,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      * @return The actor associated to ref
      * @throws NoSuchActorException if no actor was found
      */
-    public Actor<?> getActor(ActorRef<?> ref) {
+    public Actor<? extends Message> getActor(ActorRef<? extends Message> ref) {
         Actor ret = null;
         try {
             ret = actors.get(ref.getName());

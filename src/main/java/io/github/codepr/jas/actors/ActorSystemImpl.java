@@ -22,7 +22,7 @@
  * SOFTWARE.
  * <p/>
  */
-package io.github.codepr.jas.actors.impl;
+package io.github.codepr.jas.actors;
 
 import java.util.concurrent.Executors;
 import java.rmi.RemoteException;

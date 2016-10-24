@@ -22,7 +22,7 @@
  * SOFTWARE.
  * <p/>
  */
-package io.github.codepr.jas.actors.impl;
+package io.github.codepr.jas.actors;
 
 import java.rmi.RemoteException;
 import io.github.codepr.jas.actors.ActorSystem;

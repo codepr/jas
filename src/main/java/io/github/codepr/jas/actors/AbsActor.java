@@ -29,7 +29,7 @@ import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 import io.github.codepr.jas.actors.exceptions.UnsupportedMessageException;
 import io.github.codepr.jas.actors.mailbox.MailBox;
 import io.github.codepr.jas.actors.mailbox.MailBoxImpl;
-import io.github.codepr.jas.actors.impl.AbsActorRef;
+import io.github.codepr.jas.actors.AbsActorRef;
 
 /**
  * Defines common properties of all actors.

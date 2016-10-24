@@ -40,7 +40,7 @@ import io.github.codepr.jas.actors.ActorRef;
 import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
-import io.github.codepr.jas.actors.impl.AbsActorRef;
+import io.github.codepr.jas.actors.AbsActorRef;
 
 /**
  * Basic cluster implementation, handle an {@code ActorSystem} for every

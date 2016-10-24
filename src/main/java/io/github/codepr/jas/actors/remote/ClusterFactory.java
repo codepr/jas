@@ -44,10 +44,10 @@ public class ClusterFactory {
         return cluster;
     }
 
-    public static final Cluster joinCluster(ActorSystem system, String seedHost) {
+    public static final Cluster joinCluster(ActorSystem system, String host) {
         Cluster cluster = null;
         try {
-            final String host = InetAddress.getLocalHost().getHostAddress();
+            final String seedHost = InetAddress.getLocalHost().getHostAddress();
             cluster = new ClusterImpl(system, host, seedHost);
         } catch (UnknownHostException | RemoteException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class ClusterFactory {
         return cluster;
     }
 
-    public static final Cluster joinCluster(ActorSystem system, String seedHost, String host) {
+    public static final Cluster joinCluster(ActorSystem system, String host, String seedHost) {
         Cluster cluster = null;
         try {
             cluster = new ClusterImpl(system, host, seedHost);

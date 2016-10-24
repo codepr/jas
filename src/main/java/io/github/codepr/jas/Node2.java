@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import io.github.codepr.jas.actors.ActorRef;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.ActorSystem.SystemMode;
-import io.github.codepr.jas.actors.impl.ActorSystemImpl;
+import io.github.codepr.jas.actors.ActorSystemImpl;
 import io.github.codepr.jas.actors.remote.Cluster;
 import io.github.codepr.jas.actors.remote.ClusterFactory;
 

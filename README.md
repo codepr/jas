@@ -94,7 +94,10 @@ public class Main {
 
 #### Cluster Mode
 
-**Node 1**
+The system can be distributed across a network of computers, here an example
+setting up a two nodes cluster:
+
+**Node 1 - IP: 10.0.0.1**
 
 ```java
 import java.rmi.RemoteException;
@@ -118,7 +121,9 @@ public class Node1 {
 }
 ```
 
-**Node 2**
+**Node 2 - IP: 10.0.0.2**
+
+`actorSelection` can be used to locate remote actors inside the cluster
 
 ```java
 import java.rmi.RemoteException;
@@ -146,7 +151,7 @@ public class Node2 {
 The `jas` project is configured as a [Maven](https://maven.apache.org/) project. In detail, it was generated using the following command line:
 
 ```sh
-$ mvn archetype:generate -DarchetypeGroupId=io.github.codepr.jas.actors -DarchetypeArtifactId=pcd-actors -DarchetypeVersion=1.0-SNAPSHOT.
+$ mvn archetype:generate -DarchetypeGroupId=io.github.codepr.jas.actors -DarchetypeArtifactId=jas -DarchetypeVersion=1.0-SNAPSHOT.
 ```
 
 To build the actor system library use the following command
@@ -155,7 +160,7 @@ To build the actor system library use the following command
 $ mvn package
 ```
 
-The output library will be created by Maven inside the folder `target`, with name `pcd-actors.jar`.
+The output library will be created by Maven inside the folder `target`, with name `jas.jar`.
 
 To run the tests use the command
 

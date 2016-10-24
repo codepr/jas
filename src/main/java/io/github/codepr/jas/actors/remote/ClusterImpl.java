@@ -106,16 +106,16 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         System.out.println(" [*] New member added to the cluster: rmi://" + name);
     }
 
-/**
- * Create an instance of {@code actor} returning a {@link ActorRef reference}
- * to it using the given {@code mode} and a unique name inside the cluster.
- *
- * @param actor The type of actor that has to be created
- * @param mode The mode of the actor requested
- * @param name The name of the actor inside the cluster, must be unique
- *
- * @return A reference to the actor
- */
+    /**
+     * Create an instance of {@code actor} returning a {@link ActorRef reference}
+     * to it using the given {@code mode} and a unique name inside the cluster.
+     *
+     * @param actor The type of actor that has to be created
+     * @param mode The mode of the actor requested
+     * @param name The name of the actor inside the cluster, must be unique
+     *
+     * @return A reference to the actor
+     */
     @Override
     public ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
         if (mode == ActorMode.LOCAL) {
@@ -270,7 +270,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * Stops all actors of the system on the cluster node.
      */
     @Override
-    public void stopSystem() throws RemoteException {
+    public synchronized void stopSystem() throws RemoteException {
         system.stop();
     }
 

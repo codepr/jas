@@ -1,8 +1,8 @@
 # Jas - A legacy implementation of an actor system
 
 A system that abstract a simplified implementation of
-the [actor model](https://en.wikipedia.org/wiki/Actor_model). Started as
-a [university project](https://github.com/codepr/pcd-actors) for a concurrent
+the [actor model](https://en.wikipedia.org/wiki/Actor_model). Originally started
+as a [university project](https://github.com/codepr/pcd-actors) for a concurrent
 and distributed programming course, I proceeded to add some features like
 support for remote actors and a basic cluster system based on legacy RMI
 technology.
@@ -167,6 +167,7 @@ $ mvn test
 
 * Some refactoring of bad code parts
 * Better handle of the `RemoteException` thing, specially for local actors
+* Add a `RMISecurityManager`
 * Decouple of the remote calls from the local ones
 * A basic failure detection on the cluster side of the project
 

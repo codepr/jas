@@ -31,6 +31,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import io.github.codepr.jas.actors.ActorSystem;
+import io.github.codepr.jas.actors.ActorSystem.SystemMode;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.AbsActorSystem;
 import io.github.codepr.jas.actors.ActorRef;
@@ -52,7 +53,14 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
      * Reference to the {@code system}
      */
     protected final AbsActorSystem system;
+    /**
+     * Name of the {@code ActorRef} bound to the registry
+     */
     protected final String name;
+    /**
+     * {@code ActorRef} reference representing the original sender of the
+     * {@code Message} in case of remote communication
+     */
     protected ActorRef<T> originalSender;
 
     /**
@@ -64,19 +72,32 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         this.system = (AbsActorSystem) system;
         this.name = name;
         this.originalSender = this;
-        // if (mode == ActorMode.REMOTE) {
-        try {
-            Naming.bind("rmi://" + name, this);
-        } catch (AlreadyBoundException | MalformedURLException e) {
-            e.printStackTrace();
+        if (this.system.getSystemMode() == SystemMode.CLUSTER) {
+            try {
+                Naming.bind("rmi://" + name, this);
+            } catch (AlreadyBoundException | MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
-        // }
     }
 
+    /**
+     * Set the {@code ActorRef} reference representing the original sender of
+     * the {@code Message} in case of remote {@code ActorRef}.
+     */
     @Override
-    public void setOriginalSender(ActorRef<T> originalSender) throws RemoteException { this.originalSender = originalSender; }
+    public void setOriginalSender(ActorRef<T> originalSender) throws RemoteException {
+        this.originalSender = originalSender;
+    }
 
-    public ActorRef<T> getOriginalSender() throws RemoteException { return this.originalSender; }
+    /**
+     * Return the {@code ActorRef} reference of the original sender of the
+     * {@code Message} in case of remote {@code ActorRef}.
+     */
+    @Override
+    public ActorRef<T> getOriginalSender() throws RemoteException {
+        return this.originalSender;
+    }
 
     /**
      * Return the name of the actor

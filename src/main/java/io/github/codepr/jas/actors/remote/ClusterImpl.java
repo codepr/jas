@@ -39,6 +39,7 @@ import io.github.codepr.jas.actors.Actor;
 import io.github.codepr.jas.actors.ActorRef;
 import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
+import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 import io.github.codepr.jas.actors.impl.AbsActorRef;
 
 /**
@@ -183,6 +184,46 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                         e. printStackTrace();
                     }
                 });
+    }
+
+    @Override
+    public void stop(ActorRef<?> actorRef) throws RemoteException {
+        AbsActorSystem abSystem = (AbsActorSystem) system;
+        if (!abSystem.contains(actorRef)) {
+            String destName = actorRef.getName();
+            if (abSystem.containsRemote(destName)) {
+                try {
+                    String addr = destName.split("/")[0];
+                    String memberName = (String)
+                        members.stream().filter(x -> x.startsWith(addr)).toArray()[0];
+                    Cluster clusterMember = (Cluster) Naming.lookup("rmi://" + memberName);
+                    clusterMember.stop(actorRef);
+                } catch (NotBoundException | MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            } else throw new NoSuchActorException();
+        } else {
+            system.stop(actorRef);
+        }
+    }
+
+    @Override
+    public void stop() throws RemoteException {
+        members.stream()
+            .forEach(x -> {
+                    try {
+                        final Cluster clusterMember =
+                            (Cluster) Naming.lookup("rmi://" + x);
+                        clusterMember.stopSystem();
+                    } catch (RemoteException | NotBoundException | MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    @Override
+    public void stopSystem() throws RemoteException {
+        system.stop();
     }
 
     /**

@@ -77,6 +77,16 @@ public class TestActorRef<T extends Message> implements ActorRef<T> {
     }
 
     @Override
+    public void setOriginalSender(ActorRef<T> originalSender) throws RemoteException {
+        reference.setOriginalSender(originalSender);
+    }
+
+    @Override
+    public ActorRef<T> getOriginalSender() throws RemoteException {
+        return reference.getOriginalSender();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return reference.equals(obj);
     }

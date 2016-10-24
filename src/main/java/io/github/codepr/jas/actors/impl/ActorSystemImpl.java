@@ -49,6 +49,15 @@ public class ActorSystemImpl extends AbsActorSystem {
      * Constructor to initialize {@code eService} as a {@code newCachedThreadPool}
      */
     public ActorSystemImpl() {
+        super();
+        eService = Executors.newCachedThreadPool();
+    }
+
+    /**
+     * Constructor to initialize {@code eService} as a {@code newCachedThreadPool}
+     */
+    public ActorSystemImpl(SystemMode systemMode) {
+        super(systemMode);
         eService = Executors.newCachedThreadPool();
     }
 

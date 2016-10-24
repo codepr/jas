@@ -95,11 +95,23 @@ public interface ActorSystem {
     void stop();
 
     /**
-     * Possible modes to create an actor. {@code LOCALE} mode is used to create an actor
-     * that acts in the local system. {@code REMOTE} mode is used to create remote actors.
+     * Possible modes to create an actor. {@code LOCALE} mode is used to create
+     * an actor that acts in the local system. {@code REMOTE} mode is used to
+     * create remote actors.
      */
     enum ActorMode {
         LOCAL,
         REMOTE
+    }
+
+    /**
+     * Possible modes to create an {@code ActorSystem}. {@code DEFAULT} mode is
+     * used to create an {@code ActorSystem} that runs on a single machine, and
+     * it's the default choice, {@code CLUSTER} mode is used to start a cluster
+     * of connected systems.
+     */
+    enum SystemMode {
+        DEFAULT,
+        CLUSTER
     }
 }

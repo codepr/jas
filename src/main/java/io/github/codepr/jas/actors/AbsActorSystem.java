@@ -53,10 +53,26 @@ public abstract class AbsActorSystem implements ActorSystem {
      * Associates every remote name to the remote Actor identified by
      */
     private Map<String, ActorRef<?>> remoteActors;
+    /**
+     * {@code ActorSystem} mode, can be either {@code DEFAULT} to run on a
+     * single machine, or {@code CLUSTER} to run on a cluster of multiple nodes.
+     */
+    protected final SystemMode systemMode;
 
     public AbsActorSystem() {
-        actors = new ConcurrentHashMap<>();
-        remoteActors = new ConcurrentHashMap<>();
+        this.actors = new ConcurrentHashMap<>();
+        this.remoteActors = new ConcurrentHashMap<>();
+        this.systemMode = SystemMode.DEFAULT;
+    }
+
+    public AbsActorSystem(SystemMode systemMode) {
+        this.actors = new ConcurrentHashMap<>();
+        this.remoteActors = new ConcurrentHashMap<>();
+        this.systemMode = systemMode;
+    }
+
+    public final SystemMode getSystemMode() {
+        return this.systemMode;
     }
 
     @Override

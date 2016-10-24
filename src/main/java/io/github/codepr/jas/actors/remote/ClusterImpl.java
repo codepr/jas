@@ -55,7 +55,6 @@ import io.github.codepr.jas.actors.AbsActorRef;
  */
 public class ClusterImpl extends UnicastRemoteObject implements Cluster {
 
-    // public static final long serialVersionUID = 227L;
     /**
      * A unique id inside the cluster, must be unique to be registered in the
      * RMI registry
@@ -95,12 +94,28 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         }
     }
 
+    /**
+     * Join the cluster by adding the requester name to the concurrent set used
+     * to track members inside the cluster.
+     *
+     * @param name A String representing the name of the new member to be added
+     */
     @Override
     public void join(String name) throws RemoteException {
         members.add(name);
         System.out.println(" [*] New member added to the cluster: rmi://" + name);
     }
 
+/**
+ * Create an instance of {@code actor} returning a {@link ActorRef reference}
+ * to it using the given {@code mode} and a unique name inside the cluster.
+ *
+ * @param actor The type of actor that has to be created
+ * @param mode The mode of the actor requested
+ * @param name The name of the actor inside the cluster, must be unique
+ *
+ * @return A reference to the actor
+ */
     @Override
     public ActorRef actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
         if (mode == ActorMode.LOCAL) {
@@ -123,6 +138,11 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         }
     }
 
+    /**
+     * Select a remote actor located on another {@code ActorSystem}.
+     *
+     * @param address The address of the remote actors to be retrieved
+     */
     @Override
     public ActorRef actorSelection(String address) throws RemoteException {
         ActorRef remoteRef = null;
@@ -135,6 +155,16 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         return remoteRef;
     }
 
+    /**
+     * Add a remote {@code ActorRef} reference to the system associated to the
+     * current node inside the cluster, in order to make aware of Remote Actors
+     * all members of the cluster.
+     *
+     * @param name A String representing the name of the {@code ActorRef} inside
+     * the cluster
+     * @param remoteRef a {@code ActorRef} reference representing the remote
+     * actor
+     */
     @Override
     public void addRemoteRef(String name, ActorRef<?> remoteRef) throws RemoteException {
         ((AbsActorSystem) system).addRemoteRef(name, remoteRef);
@@ -170,6 +200,13 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 });
     }
 
+    /**
+     * Update new members' remote actors map so they can access to the actors
+     * located on other {@code ActorSystem}.
+     *
+     * @param newMember The identifier name of the new member, in order to be
+     * located across the cluster and be updated with remote actors table.
+     */
     @Override
     public void updateRemoteActors(String newMember) throws RemoteException {
         system.getRemoteActors()
@@ -186,6 +223,11 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 });
     }
 
+    /**
+     * Stops {@code actor} inside the cluster.
+     *
+     * @param actor The actor to be stopped
+     */
     @Override
     public void stop(ActorRef<?> actorRef) throws RemoteException {
         AbsActorSystem abSystem = (AbsActorSystem) system;
@@ -207,6 +249,9 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         }
     }
 
+    /**
+     * Send stop message to all {@code ActorSystem} of the cluster.
+     */
     @Override
     public void stop() throws RemoteException {
         members.stream()
@@ -221,6 +266,9 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 });
     }
 
+    /**
+     * Stops all actors of the system on the cluster node.
+     */
     @Override
     public void stopSystem() throws RemoteException {
         system.stop();

@@ -71,13 +71,35 @@ public abstract class AbsActorSystem implements ActorSystem {
         this.systemMode = systemMode;
     }
 
+    /**
+     * Return the {@code SystemMode} of the current {@code ActorSystem}
+     */
     public final SystemMode getSystemMode() {
         return this.systemMode;
     }
 
+    /**
+     * Return the remote actors {@code Map} tracking all remote reference of
+     * {@code ActorRef}.
+     *
+     * @return A {@code Map<String, ActorRef<?>>} containing all remote
+     * reference of the cluster.
+     */
     @Override
-    public Map<String, ActorRef<?>> getRemoteActors() { return this.remoteActors; }
+    public Map<String, ActorRef<?>> getRemoteActors() {
+        return this.remoteActors;
+    }
 
+    /**
+     * Create an instance of {@code actor} returning a {@link ActorRef reference}
+     * to it using the given {@code mode} and a name.
+     *
+     * @param actor The type of actor that has to be created
+     * @param mode The mode of the actor requested
+     * @param name The name of the actor inside the cluster, must be unique
+     *
+     * @return A reference to the actor
+     */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) {
 
@@ -98,8 +120,18 @@ public abstract class AbsActorSystem implements ActorSystem {
         return reference;
     }
 
+    /**
+     * Create an instance of {@code actor} returning a {@link ActorRef reference}
+     * to it using the given {@code mode}, generating a UUID as name.
+     *
+     * @param actor The type of actor that has to be created
+     * @param mode The mode of the actor requested
+     *
+     * @return A reference to the actor
+     */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode) {
+        // default to localhost
         String host = "127.0.0.1";
         if (mode == ActorMode.REMOTE) {
             try {
@@ -111,11 +143,22 @@ public abstract class AbsActorSystem implements ActorSystem {
         } else return actorOf(actor, mode, UUID.randomUUID().toString());
     }
 
+    /**
+     * Create an instance of {@code actor} that executes locally.
+     *
+     * @param actor The type of actor that has to be created
+     * @return A reference to the actor
+     */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor) {
         return this.actorOf(actor, ActorMode.LOCAL);
     }
 
+    /**
+     * Stops {@code actor}.
+     *
+     * @param actor The actor to be stopped
+     */
     @Override
     public void stop(ActorRef<?> actor) {
         String name = "";
@@ -129,6 +172,9 @@ public abstract class AbsActorSystem implements ActorSystem {
         actors.remove(name);
     }
 
+    /**
+     * Stops all actors of the system.
+     */
     @Override
     public void stop() {
         actors.entrySet()
@@ -137,6 +183,9 @@ public abstract class AbsActorSystem implements ActorSystem {
         actors.clear();
     }
 
+    /**
+     * Check if the current {@code ActorSystem} contains a given {@code ActorRef}
+     */
     public boolean contains(ActorRef<?> actorRef) {
         String name = "";
         try {
@@ -145,10 +194,17 @@ public abstract class AbsActorSystem implements ActorSystem {
         return (actors.containsKey(name)) ? true : false;
     }
 
+    /**
+     * Check if the current {@code ActorSystem} contains a given
+     * remote {@code ActorRef}
+     */
     public boolean containsRemote(String name) {
         return (remoteActors.containsKey(name)) ? true : false;
     }
 
+    /**
+     * Add a remote {@code ActorRef} to the current {@code ActorSystem}
+     */
     public void addRemoteRef(String name, ActorRef<?> remoteRef) {
         remoteActors.put(name, remoteRef);
     }

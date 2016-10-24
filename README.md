@@ -16,7 +16,13 @@ handle the distributed part of the Actor System.
 
 The basic structure has been enveloped on a fairly basic and still without
 failure-detection cluster system featuring legacy java RMI, therefore it needs
-an *rmi registry* running.
+a *rmi registry* running.
+
+Basically, starting the cluster as a seed (can be seen as leader node) all other
+nodes can subsequently join by specifying the seed address; every time a new member
+joins the cluster, all other nodes will be update their members list and everytime
+an `ActorSystem` create an actor, either `LOCAL` or `REMOTE` all members of the
+cluster update their systems in order to track all actors on the cluster.
 
 ### General operations
 
@@ -69,16 +75,12 @@ import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.ActorSystemImpl;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ActorSystem system = new ActorSystemImpl();
-        try {
-            ActorRef ref1 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref1");
-            ActorRef ref2 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref2");
-            ActorRef ref5 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref5");
-            ref1.send(new TrivialMessage(), ref2);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        ActorRef ref1 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref1");
+        ActorRef ref2 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref2");
+        ActorRef ref5 = system.actorOf(TrivialActor.class, ActorMode.LOCAL, "127.0.0.1/ref5");
+        ref1.send(new TrivialMessage(), ref2);
     }
 }
 ```
@@ -97,18 +99,14 @@ import io.github.codepr.jas.actors.remote.Cluster;
 import io.github.codepr.jas.actors.remote.ClusterFactory;
 
 public class Node1 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // ActorSystemImpl takes at least 1 argument, here we start it in CLUSTER mode, setting the host as 10.0.0.1
         // and the seed host (can be seen as a leader needed to start and join the cluster) to the same address.
         // If omitted those fields default to 127.0.0.1
         Cluster cluster = ClusterFactory.joinCluster(new ActorSystemImpl(SystemMode.CLUSTER), "10.0.0.1", "10.0.0.1");
-        try {
-            ActorRef ref1 = cluster.actorOf(TrivialActor.class, ActorMode.LOCAL, "10.0.0.1/ref1");
-            ActorRef ref2 = cluster.actorOf(TrivialActor.class, ActorMode.REMOTE, "10.0.0.1/ref2");
-            ActorRef ref5 = cluster.actorOf(TrivialActor.class, ActorMode.REMOTE, "10.0.0.1/ref5");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        ActorRef ref1 = cluster.actorOf(TrivialActor.class, ActorMode.LOCAL, "10.0.0.1/ref1");
+        ActorRef ref2 = cluster.actorOf(TrivialActor.class, ActorMode.REMOTE, "10.0.0.1/ref2");
+        ActorRef ref5 = cluster.actorOf(TrivialActor.class, ActorMode.REMOTE, "10.0.0.1/ref5");
     }
 }
 ```
@@ -125,17 +123,13 @@ import io.github.codepr.jas.actors.remote.Cluster;
 import io.github.codepr.jas.actors.remote.ClusterFactory;
 
 public class Node2 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Cluster cluster = ClusterFactory.joinCluster(new ActorSystemImpl(SystemMode.CLUSTER), "10.0.0.2", "10.0.0.1");
-        try {
-            ActorRef ref3 = cluster.actorOf(TrivialActor.class, ActorMode.LOCAL, "10.0.0.2/ref3");
-            ActorRef ref2 = cluster.actorSelection("10.0.0.1/ref2");
-            ActorRef ref5 = cluster.actorSelection("10.0.0.1/ref5");
-            ref3.send(new TrivialMessage(), ref2);
-            ref2.send(new TrivialMessage(), ref5);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        ActorRef ref3 = cluster.actorOf(TrivialActor.class, ActorMode.LOCAL, "10.0.0.2/ref3");
+        ActorRef ref2 = cluster.actorSelection("10.0.0.1/ref2");
+        ActorRef ref5 = cluster.actorSelection("10.0.0.1/ref5");
+        ref3.send(new TrivialMessage(), ref2);
+        ref2.send(new TrivialMessage(), ref5);
     }
 }
 ```
@@ -166,6 +160,7 @@ $ mvn test
 
 * Some refactoring of bad code parts
 * Better handle of the `RemoteException` thing, specially for local actors
+* Decouple of the remote calls from the local ones
 * A basic failure detection on the cluster side of the project
 
 ## License

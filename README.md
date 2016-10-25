@@ -145,16 +145,31 @@ public class Node2 {
     }
 }
 ```
+#### Execution
+
+On node1, start an *RMI registry* instance (can be done also using `rmi`
+script), supposing to have `Node1.java` and `Node2.java` inside the
+package:
+
+```sh
+$ java -cp target/classes io.github.codepr.jas.Node1
+```
+
+Same on node2
+
+```sh
+$ java -cp target/classes io.github.codepr.jas.Node2
+```
 
 ## Building
 
-The `jas` project is configured as a [Maven](https://maven.apache.org/) project. In detail, it was generated using the following command line:
+The `jas` project is configured as a [Maven](https://maven.apache.org/) project. To compile it:
 
 ```sh
-$ mvn archetype:generate -DarchetypeGroupId=io.github.codepr.jas.actors -DarchetypeArtifactId=jas -DarchetypeVersion=1.0-SNAPSHOT.
+$ mvn clean compile
 ```
 
-To build the actor system library use the following command
+To build the actor system as a library use the following command
 
 ```sh
 $ mvn package

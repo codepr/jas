@@ -46,7 +46,7 @@ public interface ActorSystem {
      * Return the remote actors {@code Map} tracking all remote reference of
      * {@code ActorRef}.
      *
-     * @return A {@code Map<String, ActorRef<?>>} containing all remote
+     * @return A {@code Map<String, ActorRef<? extends Message>>} containing all remote
      * reference of the cluster.
      */
     Map<String, ActorRef<? extends Message>> getRemoteActors();

@@ -30,7 +30,6 @@ import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
 
 /**
@@ -102,14 +101,14 @@ public abstract class AbsActorSystem implements ActorSystem {
      */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) {
-
         // ActorRef instance
-        ActorRef<?> reference;
+        ActorRef<? extends Message> reference;
         try {
             // Create the reference to the actor
             reference = this.createActorReference(mode, name);
             // Create the new instance of the actor
-            Actor actorInstance = ((AbsActor) actor.newInstance()).setSelf(reference);
+            Actor<? extends Message> actorInstance =
+                ((AbsActor) actor.newInstance()).setSelf(reference);
             // Associate the reference to the actor
             if (mode == ActorMode.LOCAL)
                 actors.put(name, actorInstance);
@@ -168,7 +167,7 @@ public abstract class AbsActorSystem implements ActorSystem {
         if (!actors.containsKey(name)) {
             throw new NoSuchActorException();
         }
-        ((AbsActor) actors.get(name)).stop();
+        ((AbsActor<? extends Message>) actors.get(name)).stop();
         actors.remove(name);
     }
 
@@ -217,7 +216,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      * @throws NoSuchActorException if no actor was found
      */
     public Actor<? extends Message> getActor(ActorRef<? extends Message> ref) {
-        Actor ret = null;
+        Actor<? extends Message> ret = null;
         try {
             ret = actors.get(ref.getName());
         } catch (RemoteException e) {}
@@ -243,6 +242,6 @@ public abstract class AbsActorSystem implements ActorSystem {
      *
      * @return An instance to {@link ActorRef}
      */
-    protected abstract ActorRef createActorReference(ActorMode mode, String name);
+    protected abstract ActorRef<? extends Message> createActorReference(ActorMode mode, String name);
 
 }

@@ -87,14 +87,14 @@ public interface Cluster extends Remote {
      *
      * @param address The address of the remote actors to be retrieved
      */
-    ActorRef actorSelection(String address) throws RemoteException;
+    ActorRef<? extends Message> actorSelection(String address) throws RemoteException;
 
     /**
      * Stops {@code actor} inside the cluster.
      *
      * @param actor The actor to be stopped
      */
-    void stop(ActorRef<?> actorRef) throws RemoteException;
+    void stop(ActorRef<? extends Message> actorRef) throws RemoteException;
 
     /**
      * Send stop message to all {@code ActorSystem} of the cluster.

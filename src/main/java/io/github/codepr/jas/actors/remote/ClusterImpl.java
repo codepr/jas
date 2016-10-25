@@ -104,7 +104,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
     @Override
     public void join(String name) throws RemoteException {
         members.add(name);
-        System.out.println(" [*] New member added to the cluster: rmi://" + name);
+        System.out.println(" [*] New member joined the cluster: rmi://" + name);
     }
 
     /**
@@ -119,24 +119,25 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode, String name) throws RemoteException {
-        if (mode == ActorMode.LOCAL) {
-            ActorRef<?> localRef = system.actorOf(actor, mode, name);
-            updateRemoteActors(name, localRef);
-            return localRef;
-        } else {
-            ActorRef<?> remoteRef = null;
+        ActorRef<? extends Message> ref = null;
+        switch (mode) {
+        case LOCAL:
+            ref = system.actorOf(actor, mode, name);
+            updateRemoteActors(name, ref);
+            break;
+        case REMOTE:
             String addr = name.split("/")[0];
             String memberName = (String)
                 members.stream().filter(x -> x.startsWith(addr)).toArray()[0];
             try {
                 Cluster remoteMember = (Cluster) Naming.lookup("rmi://" + memberName);
-                remoteRef = remoteMember.actorOf(actor, ActorMode.LOCAL, name);
-                String id = remoteRef.getName();
+                ref = remoteMember.actorOf(actor, ActorMode.LOCAL, name);
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
-            return remoteRef;
+            break;
         }
+        return ref;
     }
 
     /**
@@ -146,9 +147,9 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      */
     @Override
     public ActorRef<? extends Message> actorSelection(String address) throws RemoteException {
-        ActorRef<?> remoteRef = null;
+        ActorRef<? extends Message> remoteRef = null;
         try {
-            remoteRef = (ActorRef<?>) Naming.lookup("rmi://" + address);
+            remoteRef = (ActorRef<? extends Message>) Naming.lookup("rmi://" + address);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             System.out.println(" [!] No remote actor found " + e.getMessage());
             e.printStackTrace();

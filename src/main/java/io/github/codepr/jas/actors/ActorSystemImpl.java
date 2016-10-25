@@ -69,8 +69,8 @@ public class ActorSystemImpl extends AbsActorSystem {
      * @return An instance to {@link ActorRef}
      */
     @Override
-    protected ActorRef createActorReference(ActorMode mode, String name) {
-        ActorRef ref = null;
+    protected ActorRef<? extends Message> createActorReference(ActorMode mode, String name) {
+        ActorRef<? extends Message> ref = null;
         try {
             ref = new ActorRefImpl(this, mode, name);
         } catch (RemoteException e) {

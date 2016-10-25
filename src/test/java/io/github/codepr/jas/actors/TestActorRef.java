@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p/>
- * Copyright (c) 2015 Riccardo Cardin
+ * Copyright (c) 2016 Riccardo Cardin, Andrea Giacomo Baldan
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * <p/>
- * Please, insert description here.
- *
- * @author Riccardo Cardin
- * @version 1.0
- * @since 1.0
- */
-
-/**
- * Please, insert description here.
- *
- * @author Riccardo Cardin
- * @version 1.0
- * @since 1.0
  */
 package io.github.codepr.jas.actors;
 
@@ -45,6 +32,9 @@ import io.github.codepr.jas.actors.*;
  *
  * @author Riccardo Cardin
  * @version 1.0
+ * @since 1.0
+ * @author Andrea Giacomo Baldan
+ * @version 2.0
  * @since 1.0
  */
 public class TestActorRef<T extends Message> implements ActorRef<T> {
@@ -62,7 +52,6 @@ public class TestActorRef<T extends Message> implements ActorRef<T> {
      * @return An actor
      */
     public Actor<T> getUnderlyingActor(ActorSystem system) {
-        // implemented by andrea
         return (Actor<T>)((AbsActorSystem) system).getActor(reference);
     }
 

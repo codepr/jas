@@ -24,7 +24,10 @@
  */
 package io.github.codepr.jas.actors.remote;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -34,6 +37,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 import io.github.codepr.jas.actors.AbsActorSystem;
 import io.github.codepr.jas.actors.Actor;
 import io.github.codepr.jas.actors.ActorRef;
@@ -174,6 +178,41 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
     }
 
     /**
+     * Check if a remote host is reachable
+     *
+     * @param host A string representing the IP address of the remote host to
+     * test
+     */
+    private boolean isReachable(String host) {
+        boolean reachable = false;
+        try {
+            reachable = InetAddress.getByName(host).isReachable(5000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return reachable;
+    }
+
+    /**
+     * Check if a member is already up and reachable
+     *
+     * @param host A string representing the IP address of the remote host to
+     * test
+     * @param name A string representing the name of the member to be tested
+     */
+    private boolean isUp(String host, String name) {
+        boolean up = true;
+        try {
+            if (isReachable(host))
+                Naming.lookup("rmi://" + host + "/" + name);
+            else up = false;
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            up = false;
+        }
+        return up;
+    }
+
+    /**
      * Update members {@code Set} of every member of the cluster
      *
      * @param seedHost The seed node used to start and join the cluster, can be
@@ -181,7 +220,21 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param memberName The new joining member unique name inside the cluster
      */
     private void updateMembers(String seedHost, String memberName) {
+        boolean reachableAndUp = false;
+        // check if the seed node is already up and running
         try {
+            while (!reachableAndUp) {
+                reachableAndUp = isUp(seedHost, "master");
+                System.out.println(" [*] Waiting for seed host " + seedHost + " to be reachable");
+                if (reachableAndUp)
+                    System.out.println(" [*] Seed host up and running, connecting..");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // the seed host is up and running
             final Cluster cluster = (Cluster) Naming.lookup("rmi://" + seedHost + "/master");
             cluster.join(memberName);
             // update remote actors to the newest joined node

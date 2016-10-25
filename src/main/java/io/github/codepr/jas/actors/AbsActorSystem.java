@@ -56,7 +56,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      * {@code ActorSystem} mode, can be either {@code DEFAULT} to run on a
      * single machine, or {@code CLUSTER} to run on a cluster of multiple nodes.
      */
-    protected final SystemMode systemMode;
+    private final SystemMode systemMode;
 
     public AbsActorSystem() {
         this.actors = new ConcurrentHashMap<>();

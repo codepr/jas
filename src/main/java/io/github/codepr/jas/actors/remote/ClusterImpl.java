@@ -220,11 +220,10 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param memberName The new joining member unique name inside the cluster
      */
     private void updateMembers(String seedHost, String memberName) {
-        boolean reachableAndUp = false;
+        boolean reachableAndUp = isUp(seedHost, "master");;
         // check if the seed node is already up and running
         try {
             while (!reachableAndUp) {
-                reachableAndUp = isUp(seedHost, "master");
                 System.out.println(" [*] Waiting for seed host " + seedHost + " to be reachable");
                 if (reachableAndUp)
                     System.out.println(" [*] Seed host up and running, connecting..");
@@ -233,6 +232,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                reachableAndUp = isUp(seedHost, "master");
             }
             // the seed host is up and running
             final Cluster cluster = (Cluster) Naming.lookup("rmi://" + seedHost + "/master");

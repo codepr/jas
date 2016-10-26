@@ -230,7 +230,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      *
      * @param receivingLoop Runnable type to be executed
      */
-    public abstract void startActorReceiveLoop(Runnable receivingLoop);
+    public abstract void startActorRunnable(Runnable actorRunnable);
 
     /**
      * Create an instance of {@link ActorRef}

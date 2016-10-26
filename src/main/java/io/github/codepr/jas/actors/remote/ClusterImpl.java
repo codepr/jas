@@ -27,7 +27,6 @@ package io.github.codepr.jas.actors.remote;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -37,7 +36,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import io.github.codepr.jas.actors.AbsActorSystem;
 import io.github.codepr.jas.actors.Actor;
 import io.github.codepr.jas.actors.ActorRef;
@@ -45,7 +43,6 @@ import io.github.codepr.jas.actors.ActorSystem;
 import io.github.codepr.jas.actors.ActorSystem.ActorMode;
 import io.github.codepr.jas.actors.Message;
 import io.github.codepr.jas.actors.exceptions.NoSuchActorException;
-import io.github.codepr.jas.actors.AbsActorRef;
 
 /**
  * Basic cluster implementation, handle an {@code ActorSystem} for every
@@ -127,7 +124,9 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
         switch (mode) {
         case LOCAL:
             ref = system.actorOf(actor, mode, name);
-            updateRemoteActors(name, ref);
+            synchronized(this) {
+                updateRemoteActors(name, ref);
+            }
             break;
         case REMOTE:
             String addr = name.split("/")[0];
@@ -284,7 +283,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * @param actor The actor to be stopped
      */
     @Override
-    public void stop(ActorRef<? extends Message> actorRef) throws RemoteException {
+    public synchronized void stop(ActorRef<? extends Message> actorRef) throws RemoteException {
         AbsActorSystem abSystem = (AbsActorSystem) system;
         if (!abSystem.contains(actorRef)) {
             String destName = actorRef.getName();
@@ -308,7 +307,7 @@ public class ClusterImpl extends UnicastRemoteObject implements Cluster {
      * Send stop message to all {@code ActorSystem} of the cluster.
      */
     @Override
-    public void stop() throws RemoteException {
+    public synchronized void stop() throws RemoteException {
         members.stream()
             .forEach(x -> {
                     try {

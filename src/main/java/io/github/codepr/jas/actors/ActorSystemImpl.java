@@ -95,7 +95,7 @@ public class ActorSystemImpl extends AbsActorSystem {
      * @param receivingLoop Runnable type to be executed
      */
     @Override
-    public void startActorReceiveLoop(Runnable receivingLoop) {
-        eService.execute(receivingLoop);
+    public void startActorRunnable(Runnable actorRunnable) {
+        eService.execute(actorRunnable);
     }
 }

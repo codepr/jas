@@ -118,15 +118,20 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
         if (!system.contains(to)) {
             String destName = to.getName();
             if (system.containsRemote(destName)) {
-                try {
-                    String realDest = to.getOriginalSender().getName();
-                    System.out.println(" [" + originalSender.getName() + "] sending message to remote actor: " + realDest);
-                    ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + destName);
-                    remoteRef.setOriginalSender(this);
-                    remoteRef.send(message, to);
-                } catch (NotBoundException | MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                String realDest = to.getOriginalSender().getName();
+                System.out.println(" [" + originalSender.getName() + "] sending message to remote actor: " + realDest);
+                system.startActorRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                ActorRef<T> remoteRef = (ActorRef<T>) Naming.lookup("rmi://" + destName);
+                                remoteRef.setOriginalSender(AbsActorRef.this);
+                                remoteRef.send(message, to);
+                            } catch (RemoteException | NotBoundException | MalformedURLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
             } else throw new NoSuchActorException();
         } else {
             try {
@@ -145,7 +150,7 @@ public abstract class AbsActorRef<T extends Message> extends UnicastRemoteObject
      * Execute a runnable using {@code system}
      * @param receivingLoop Runnable type to be executed
      */
-    public void startReceivingLoop(Runnable receivingLoop) throws RemoteException {
-        system.startActorReceiveLoop(receivingLoop);
+    public void startReceivingLoop(Runnable actorRunnable) throws RemoteException {
+        system.startActorRunnable(actorRunnable);
     }
 }
